@@ -8,7 +8,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class TaskStateService {
   private readonly api = inject(TaskApiService);
-  private readonly destroyRef = inject(DestroyRef);
 
   // State
   private readonly _tasks = signal<Task[]>([]);
@@ -25,61 +24,49 @@ export class TaskStateService {
     this._loading.set(true);
     this._error.set(null);
 
-    this.api
-      .getAll()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (tasks) => {
-          this._tasks.set(tasks);
-          this._loading.set(false);
-        },
-        error: () => {
-          this._error.set('Failed to load tasks');
-          this._loading.set(false);
-        },
-      });
+    this.api.getAll().subscribe({
+      next: (tasks) => {
+        this._tasks.set(tasks);
+        this._loading.set(false);
+      },
+      error: () => {
+        this._error.set('Failed to load tasks');
+        this._loading.set(false);
+      },
+    });
   }
 
   addTask(task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>): void {
-    this.api
-      .create(task)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (newTask) => {
-          this._tasks.update((tasks) => [...tasks, newTask]);
-        },
-        error: () => {
-          this._error.set('Failed to add task');
-        },
-      });
+    this.api.create(task).subscribe({
+      next: (newTask) => {
+        this._tasks.update((tasks) => [...tasks, newTask]);
+      },
+      error: () => {
+        this._error.set('Failed to add task');
+      },
+    });
   }
 
   updateTask(id: string, task: Partial<Task>): void {
-    this.api
-      .update(id, task)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (updatedTask) => {
-          this._tasks.update((tasks) => tasks.map((t) => (t.id === id ? updatedTask : t)));
-        },
-        error: () => {
-          this._error.set('Failed to update task');
-        },
-      });
+    this.api.update(id, task).subscribe({
+      next: (updatedTask) => {
+        this._tasks.update((tasks) => tasks.map((t) => (t.id === id ? updatedTask : t)));
+      },
+      error: () => {
+        this._error.set('Failed to update task');
+      },
+    });
   }
 
   deleteTask(id: string): void {
-    this.api
-      .delete(id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this._tasks.update((tasks) => tasks.filter((t) => t.id !== id));
-        },
-        error: () => {
-          this._error.set('Failed to delete task');
-        },
-      });
+    this.api.delete(id).subscribe({
+      next: () => {
+        this._tasks.update((tasks) => tasks.filter((t) => t.id !== id));
+      },
+      error: () => {
+        this._error.set('Failed to delete task');
+      },
+    });
   }
 
   // Specific actions
