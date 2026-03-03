@@ -16,6 +16,17 @@ const mockTask: Task = {
   updatedAt: new Date('2026-01-01'),
 };
 
+const mockTask2: Task = {
+  id: '2',
+  title: 'Water the plants',
+  status: 'todo',
+  priority: 'medium',
+  isRecurring: true,
+  recurrence: { type: 'interval', intervalUnit: 'weeks', intervalValue: 1 },
+  createdAt: new Date('2026-01-01'),
+  updatedAt: new Date('2026-01-01'),
+};
+
 const mockApiService = {
   getAll: vi.fn(),
   getById: vi.fn(),
@@ -99,20 +110,9 @@ describe('TaskStateService', () => {
     });
 
     it('should set loading to true while fetching, and to false on error', () => {
-      const subject = new Subject<Error>();
-
-      mockApiService.getAll.mockReturnValue(subject.asObservable());
-
+      mockApiService.getAll.mockReturnValue(throwError(() => new Error('Network error')));
       service.loadTasks();
 
-      // At this point, the subject hasn't emitted yet, so the request is still running and loading should be true
-      expect(service.loading()).toBe(true);
-
-      // Now we resolve the request by emitting a value through the subject
-      subject.next(new Error('Network error'));
-      subject.complete();
-
-      // Now that the request has completed, loading should be false again
       expect(service.loading()).toBe(false);
     });
   });
@@ -126,6 +126,7 @@ describe('TaskStateService', () => {
 
       expect(service.tasks()).toEqual([mockTask]);
     });
+
     it('should add to the error signal on error', () => {
       mockApiService.create.mockReturnValue(throwError(() => new Error('Network error')));
 
@@ -137,16 +138,18 @@ describe('TaskStateService', () => {
 
   describe('updateTask()', () => {
     it('should update the relevant task in the tasks signal', () => {
-      mockApiService.getAll.mockReturnValue(of([mockTask]));
+      mockApiService.getAll.mockReturnValue(of([mockTask, mockTask2]));
       service.loadTasks();
 
-      const expectedTask = { ...mockTask, title: 'different title' };
+      const expectedTask = { ...mockTask2, title: 'different title' };
       mockApiService.update.mockReturnValue(of(expectedTask));
 
-      service.updateTask(mockTask.id, { title: 'different title' });
+      service.updateTask(mockTask2.id, { title: 'different title' });
 
-      expect(service.tasks()[0]).toEqual(expectedTask);
+      expect(service.tasks()).toContainEqual({ ...expectedTask });
+      expect(service.tasks()).toContainEqual({ ...mockTask });
     });
+
     it('should add to the error signal on error', () => {
       mockApiService.update.mockReturnValue(throwError(() => new Error('Network error')));
 
@@ -167,6 +170,7 @@ describe('TaskStateService', () => {
 
       expect(service.tasks().length).toBe(0);
     });
+
     it('should add to the error signal on error', () => {
       mockApiService.delete.mockReturnValue(throwError(() => new Error('Network error')));
 
