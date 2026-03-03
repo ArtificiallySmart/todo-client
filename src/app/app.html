@@ -1,1 +1,6 @@
-<pre>{{tasks() | json}}</pre>
+<button class="btn btn-primary" (click)="newTask()">taak toevoegen</button>
+
+@for(task of tasks(); track task.id){
+<p>{{task.id}} - {{task.title}}</p>
+<button class="btn btn-primary" (click)="deleteTask(task.id)"> Verwijder taak {{task.id}}</button>
+}

@@ -14,7 +14,7 @@ export const mockInterceptor: HttpInterceptorFn = (req, next) => {
     return of(new HttpResponse({ status: 200, body: mockTasks })).pipe(delay(300));
   }
 
-  if (req.method === 'post') {
+  if (req.method === 'POST') {
     const newTask = req.body as Omit<Task, 'id' | 'createdAt' | 'updatedAt'>;
     const newId = mockTasks.length.toString();
     const newDate = new Date(Date.now());
