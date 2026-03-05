@@ -6,7 +6,7 @@ import { Task } from './models/task.model';
 
 @Component({
   selector: 'app-root',
-  imports: [JsonPipe],
+  imports: [],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

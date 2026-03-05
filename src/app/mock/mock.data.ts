@@ -2,7 +2,7 @@ import { Task } from '../models/task.model';
 
 export const MOCK_TASKS: Task[] = [
   {
-    id: '1',
+    id: '104538b6-fd85-4f24-beb9-9d989842d7f6',
     title: 'Wekelijkse teamvergadering voorbereiden',
     description: 'Agenda opstellen en documenten delen met het team',
     status: 'todo',
@@ -18,7 +18,7 @@ export const MOCK_TASKS: Task[] = [
     },
   },
   {
-    id: '2',
+    id: 'a0361a42-8ac3-4819-99c7-311a2ffcd85b',
     title: 'Facturen verwerken',
     description: 'Openstaande facturen controleren en boeken',
     status: 'in-progress',
@@ -33,7 +33,7 @@ export const MOCK_TASKS: Task[] = [
     },
   },
   {
-    id: '3',
+    id: 'd7d75b8c-4100-40ca-8e3b-46a4b662710a',
     title: 'Jaarlijkse belastingaangifte',
     status: 'done',
     priority: 'low',

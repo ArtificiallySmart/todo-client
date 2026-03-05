@@ -3,8 +3,9 @@ import { MOCK_TASKS } from './mock.data';
 import { delay, of } from 'rxjs';
 import { dateTimestampProvider } from 'rxjs/internal/scheduler/dateTimestampProvider';
 import { Task } from '../models/task.model';
+import {v4 as uuidv4} from 'uuid';
 
-const mockTasks = MOCK_TASKS;
+let mockTasks = MOCK_TASKS;
 
 export const mockInterceptor: HttpInterceptorFn = (req, next) => {
   // ---------------------------------------------------------------------------
@@ -16,9 +17,10 @@ export const mockInterceptor: HttpInterceptorFn = (req, next) => {
 
   if (req.method === 'POST') {
     const newTask = req.body as Omit<Task, 'id' | 'createdAt' | 'updatedAt'>;
-    const newId = mockTasks.length.toString();
+    const newId = uuidv4();
     const newDate = new Date(Date.now());
     const createdTask: Task = { id: newId, createdAt: newDate, updatedAt: newDate, ...newTask };
+    mockTasks = [... mockTasks, createdTask];
 
     return of(new HttpResponse({ status: 201, body: createdTask }));
   }
@@ -27,8 +29,11 @@ export const mockInterceptor: HttpInterceptorFn = (req, next) => {
     const newValues = req.body as Partial<Task>;
     const id = req.url.split('/').pop()!;
     const index = mockTasks.findIndex((i) => i.id === id);
+    const updatedTask = { ...mockTasks[index], ...newValues }
+    mockTasks = mockTasks.map((t) => (t.id === id ? updatedTask : t));
+
     if (index > -1) {
-      return of(new HttpResponse({ status: 200, body: { ...mockTasks[index], ...newValues } }));
+      return of(new HttpResponse({ status: 200, body: updatedTask }));
     }
     return of(new HttpResponse({ status: 404 }));
   }
@@ -36,6 +41,7 @@ export const mockInterceptor: HttpInterceptorFn = (req, next) => {
   if (req.method === 'DELETE') {
     const id = req.url.split('/').pop()!;
     const index = mockTasks.findIndex((i) => i.id === id);
+    mockTasks = mockTasks.filter((t) => t.id !== id)
     if (index > -1) {
       return of(new HttpResponse({ status: 204 }));
     }
