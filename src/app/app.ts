@@ -25,6 +25,10 @@ export class App implements OnInit {
     this.taskState.deleteTask(id);
   }
 
+  markAsDone(id: string): void {
+    this.taskState.markAsDone(id);
+  }
+
   newTask() {
     const task = {
       title: 'Taken testen',

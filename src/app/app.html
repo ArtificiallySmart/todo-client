@@ -2,5 +2,9 @@
 
 @for(task of tasks(); track task.id){
 <p>{{task.title}}</p>
-<button class="btn btn-primary" (click)="deleteTask(task.id)"> Verwijder taak {{task.id}}</button>
+<p>Status: {{task.status}}</p>
+<button class="btn btn-primary" (click)="deleteTask(task.id)"> Verwijder taak</button>
+<button class="btn btn-primary" (click)="markAsDone(task.id)"> markeren als gedaan</button>
+<br>
+<hr>
 }
